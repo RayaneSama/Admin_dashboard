@@ -111,11 +111,12 @@ const CustomTreeItemIconContainer = styled(TreeItem2IconContainer)(
 );
 
 const CustomTreeItemGroupTransition = styled(TreeItem2GroupTransition)(
-  ({ theme }) => ({
+  ({ theme, open }) => ({
     marginLeft: 0,
     [`& .content`]: {
-      paddingLeft: theme.spacing(2),
+      paddingLeft: open ? theme.spacing(2) : 0,
     },
+    paddingLeft: open ? theme.spacing(1.5) : 0,
   })
 );
 
@@ -133,6 +134,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
     labelInfo,
     colorForDarkMode,
     bgColorForDarkMode,
+    displayIconContainer = true,
     ...other
   } = props;
 
@@ -163,33 +165,47 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
               focused: status.focused,
             }),
           })}
+          style={{ paddingLeft: 8 }}
         >
-          <CustomTreeItemIconContainer {...getIconContainerProps()}>
-            <TreeItem2Icon status={status} />
-          </CustomTreeItemIconContainer>
+          {displayIconContainer && (
+            <CustomTreeItemIconContainer {...getIconContainerProps()}>
+              <TreeItem2Icon status={status} />
+            </CustomTreeItemIconContainer>
+          )}
           <Box
             sx={{
               display: "flex",
               flexGrow: 1,
               alignItems: "center",
               p: 0.5,
-              pr: 0,
+              justifyContent: "center",
             }}
           >
-            <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />
-            <Typography
-              {...getLabelProps({
-                variant: "body2",
-                sx: { display: "flex", fontWeight: "inherit", flexGrow: 1 },
-              })}
+            <Box
+              component={LabelIcon}
+              color="inherit"
+              sx={{ mr: displayIconContainer ? 1 : 0 }}
             />
-            <Typography variant="caption" color="inherit">
-              {labelInfo}
-            </Typography>
+            {displayIconContainer && (
+              <>
+                <Typography
+                  {...getLabelProps({
+                    variant: "body2",
+                    sx: { display: "flex", fontWeight: "inherit", flexGrow: 1 },
+                  })}
+                />
+                <Typography variant="caption" color="inherit">
+                  {labelInfo}
+                </Typography>
+              </>
+            )}
           </Box>
         </CustomTreeItemContent>
         {children && (
-          <CustomTreeItemGroupTransition {...getGroupTransitionProps()} />
+          <CustomTreeItemGroupTransition
+            {...getGroupTransitionProps()}
+            open={displayIconContainer}
+          />
         )}
       </CustomTreeItemRoot>
     </TreeItem2Provider>
@@ -284,6 +300,7 @@ const SideBar = ({ open, handleDrawerClose }) => {
           sx={{ flexGrow: 1, maxWidth: 400 }}
         >
           <CustomTreeItem
+            displayIconContainer={open}
             onClick={() => {
               navigate("/mails");
             }}
@@ -291,8 +308,14 @@ const SideBar = ({ open, handleDrawerClose }) => {
             label="All Mail"
             labelIcon={MailIcon}
           />
-          <CustomTreeItem itemId="3" label="Categories" labelIcon={Label}>
+          <CustomTreeItem
+            displayIconContainer={open}
+            itemId="3"
+            label="Categories"
+            labelIcon={Label}
+          >
             <CustomTreeItem
+              displayIconContainer={open}
               itemId="5"
               label="Social"
               labelIcon={SupervisorAccountIcon}
@@ -303,6 +326,7 @@ const SideBar = ({ open, handleDrawerClose }) => {
               bgColorForDarkMode={alpha("#00b4ff", 0.2)}
             />
             <CustomTreeItem
+              displayIconContainer={open}
               itemId="6"
               label="Updates"
               labelIcon={InfoIcon}
@@ -313,6 +337,7 @@ const SideBar = ({ open, handleDrawerClose }) => {
               bgColorForDarkMode={alpha("#ff8f00", 0.2)}
             />
             <CustomTreeItem
+              displayIconContainer={open}
               itemId="7"
               label="Forums"
               labelIcon={ForumIcon}
@@ -323,7 +348,12 @@ const SideBar = ({ open, handleDrawerClose }) => {
               bgColorForDarkMode={alpha("#9035ff", 0.15)}
             />
           </CustomTreeItem>
-          <CustomTreeItem itemId="4" label="History" labelIcon={Label} />
+          <CustomTreeItem
+            displayIconContainer={open}
+            itemId="4"
+            label="History"
+            labelIcon={Label}
+          />
         </SimpleTreeView>
       </div>
     </Drawer>
